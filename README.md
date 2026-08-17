@@ -94,3 +94,9 @@ Two edits, every time:
 
 Commit both, open a PR, merge, then run **Release**. The first release fetches
 the new upstream tarball, verifies it, and caches it back automatically.
+
+---
+
+## License
+This project is licensed under the terms described in
+LICENSE.txt.
