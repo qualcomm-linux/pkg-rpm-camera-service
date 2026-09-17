@@ -8,11 +8,12 @@ Summary:        Qualcomm Linux embedded camera server
 
 License:        BSD-3-Clause-Clear
 URL:            https://github.com/qualcomm/camera-service
-Source0:        %{url}/archive/refs/tags/%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/%{version}/%{name}-%{version}.tar.gz
 
 Patch0:         0001-move-check-camx-overlay.sh-to-libexec.patch
 Patch1:         0002-Fix-typos-in-log-messages.patch
 Patch2:         0003-cam-server-base.service.in-add-missing-Documentation.patch
+Patch3:         0004-camx-guard-target-builds-and-switch-qcs-target-to-qcs-common.patch
 
 ExclusiveArch:  aarch64
 
@@ -30,7 +31,7 @@ BuildRequires:  pkgconfig(gbm)
 # TODO: the Qualcomm CamX API headers are not available in CentOS Stream 10.
 # The camera adaptor, memory interface and recorder service libraries require
 # them. Provide them through a local package and uncomment:
-#BuildRequires:  camx-devel
+BuildRequires:  libcamx-dev
 
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 # TODO: the CamX server runtime is dlopen'ed at runtime but is not packaged
@@ -147,11 +148,8 @@ against QMMF, such as the Qualcomm GStreamer camera plugins.
 
 %files libs
 %license LICENSE.txt
-%{_libdir}/libqmmf_camera_adaptor.so.*
 %{_libdir}/libqmmf_camera_adaptor_kodiak.so.*
-%{_libdir}/libqmmf_memory_interface.so.*
 %{_libdir}/libqmmf_memory_interface_kodiak.so.*
-%{_libdir}/libqmmf_recorder_service.so.*
 %{_libdir}/libqmmf_recorder_service_kodiak.so.*
 
 %files -n libqmmf-devel
@@ -159,15 +157,12 @@ against QMMF, such as the Qualcomm GStreamer camera plugins.
 %{_includedir}/qmmf-sdk/
 %{_includedir}/camera-metadata/
 %{_includedir}/proto/
-%{_libdir}/libqmmf_camera_adaptor.so
 %{_libdir}/libqmmf_camera_adaptor_kodiak.so
 %{_libdir}/libqmmf_camera_metadata.so
 %{_libdir}/libqmmf_config.so
-%{_libdir}/libqmmf_memory_interface.so
 %{_libdir}/libqmmf_memory_interface_kodiak.so
 %{_libdir}/libqmmf_proto.so
 %{_libdir}/libqmmf_recorder_client.so
-%{_libdir}/libqmmf_recorder_service.so
 %{_libdir}/libqmmf_recorder_service_kodiak.so
 %{_libdir}/libqmmf_utils.so
 %{_libdir}/pkgconfig/qmmf_camera_metadata.pc
@@ -176,5 +171,5 @@ against QMMF, such as the Qualcomm GStreamer camera plugins.
 %{_libdir}/pkgconfig/qmmf_utils.pc
 
 %changelog
-* Fri Aug 14 2026 Agathe Porte <agathe.porte@oss.qualcomm.com> - 1.0.4-1
+* Fri Aug 14 2026 Viswanath Srikanth Bathina <bathina@qti.qualcomm.com> - 1.0.4-1
 - Initial RPM packaging for CentOS Stream 10 (aarch64)
