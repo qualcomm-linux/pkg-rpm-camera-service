@@ -1,0 +1,59 @@
+From: Agathe Porte <agathe.porte@oss.qualcomm.com>
+Date: Tue, 11 Aug 2026 12:55:06 +0200
+Subject: Fix typos in log messages
+
+Fixes the following typos reported by lintian:
+
+ - spelling-error-in-binary Stoped Stopped
+ - spelling-error-in-binary Stoped Stopped
+ - spelling-error-in-binary availble available
+ - spelling-error-in-binary successfull successful
+ - spelling-error-in-binary successfull successful
+
+Forwarded: https://github.com/qualcomm/camera-service/pull/26
+Signed-off-by: Agathe Porte <agathe.porte@oss.qualcomm.com>
+---
+ common/cameraadaptor/qmmf_camera3_device_client.cc | 2 +-
+ recorder/src/service/qmmf_camera_context.cc        | 2 +-
+ recorder/src/service/qmmf_recorder_impl.cc         | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/common/cameraadaptor/qmmf_camera3_device_client.cc b/common/cameraadaptor/qmmf_camera3_device_client.cc
+index 4b19084..124e9cf 100644
+--- a/common/cameraadaptor/qmmf_camera3_device_client.cc
++++ b/common/cameraadaptor/qmmf_camera3_device_client.cc
+@@ -1520,7 +1520,7 @@ camera3_buffer_request_status_t Camera3DeviceClient::RequestStreamBuffers(
+           QMMF_ERROR("%s: Error: Ivalid state or input ", __func__);
+           returned_buf_req->status = CAMERA3_PS_BUF_REQ_STREAM_DISCONNECTED;
+         } else if (res == -ENOMEM) {
+-          QMMF_ERROR("%s: Error: no availble memory ", __func__);
++          QMMF_ERROR("%s: Error: no available memory ", __func__);
+           returned_buf_req->status = CAMERA3_PS_BUF_REQ_NO_BUFFER_AVAILABLE;
+         } else {
+           QMMF_ERROR("%s: Error: unknown ", __func__);
+diff --git a/recorder/src/service/qmmf_camera_context.cc b/recorder/src/service/qmmf_camera_context.cc
+index f40981a..7b99e9d 100644
+--- a/recorder/src/service/qmmf_camera_context.cc
++++ b/recorder/src/service/qmmf_camera_context.cc
+@@ -3034,7 +3034,7 @@ status_t CameraContext::UpdateRequest(bool cached) {
+       }
+     }
+   }
+-  QMMF_INFO("%s: SubmitRequest for Num streams(%ld) is successfull"
++  QMMF_INFO("%s: SubmitRequest for Num streams(%ld) is successful"
+       " request_id(%d) batches: %ld",  __func__, size, streaming_request_id_,
+       streaming_active_requests_.size());
+ 
+diff --git a/recorder/src/service/qmmf_recorder_impl.cc b/recorder/src/service/qmmf_recorder_impl.cc
+index b9732ad..85a392d 100644
+--- a/recorder/src/service/qmmf_recorder_impl.cc
++++ b/recorder/src/service/qmmf_recorder_impl.cc
+@@ -793,7 +793,7 @@ status_t RecorderImpl::StopVideoTracks(
+   assert(camera_source_ != nullptr);
+   uint32_t ret = camera_source_->StopTrackSources(service_track_ids);
+   if (ret == 0) {
+-    QMMF_INFO("%s: StopTrackSources Stoped Successfully!", __func__);
++    QMMF_INFO("%s: StopTrackSources Stopped Successfully!", __func__);
+     for (auto service_track_id : service_track_ids) {
+       uint32_t track_id = GetClientTrackId(client_id, service_track_id);
+       ChangeTrackState(client_id, track_id, TrackState::kIdle);
