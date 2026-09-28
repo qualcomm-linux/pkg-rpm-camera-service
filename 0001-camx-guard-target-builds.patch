@@ -1,0 +1,27 @@
+From: Viswanath Srikanth Bathina <bathina@qti.qualcomm.com>
+Date: Mon, 28 Sep 2026 12:41:45 +0530
+Subject: [PATCH] Guard optional CamX target builds
+
+Only configure target-specific server libraries when the corresponding CamX
+headers are available in the build sysroot.
+
+Upstream-Status: Pending
+Signed-off-by: Viswanath Srikanth Bathina <bathina@qti.qualcomm.com>
+---
+ CMakeLists.txt | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -137 +137,4 @@
+-    build_target("_kodiak" "qcm6490" "${CAMX_KODIAK_INCLUDE_DIRS}")
++    if(DEFINED CAMX_KODIAK_INCLUDE_DIRS)
++      build_target("_kodiak" "qcm6490" "${CAMX_KODIAK_INCLUDE_DIRS}")
++    endif()
++
+@@ -139 +142,3 @@
+-    build_target("" "qcs-common" "${CAMX_TARGET_INCLUDE_DIRS}")
++    if(DEFINED CAMX_TARGET_INCLUDE_DIRS)
++      build_target("" "qcs-common" "${CAMX_TARGET_INCLUDE_DIRS}")
++    endif()
