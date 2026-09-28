@@ -2,7 +2,7 @@
 %global _hardened_build 1
 
 Name:           qcom-camera-server
-Version:        1.0.4
+Version:        1.0.6
 Release:        1%{?dist}
 Summary:        Qualcomm Linux embedded camera server
 
@@ -10,10 +10,7 @@ License:        BSD-3-Clause-Clear
 URL:            https://github.com/qualcomm/camera-service
 Source0:        %{url}/archive/refs/tags/%{version}/camera-service-%{version}.tar.gz
 
-Patch0:         0001-move-check-camx-overlay.sh-to-libexec.patch
-Patch1:         0002-Fix-typos-in-log-messages.patch
-Patch2:         0003-cam-server-base.service.in-add-missing-Documentation.patch
-Patch3:         0004-camx-guard-target-builds-and-switch-qcs-target-to-qcs-common.patch
+Patch0:         0001-camx-guard-target-builds.patch
 
 ExclusiveArch:  aarch64
 
@@ -31,12 +28,11 @@ BuildRequires:  pkgconfig(gbm)
 BuildRequires:  libcamx-dev
 
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-Recommends:     camx-server-runtime
 
 %description
 The Qualcomm MultiMedia Framework (QMMF) provides the camera recorder
 service and client stack used by Qualcomm Linux camera pipelines.
-This package contains the cam-server daemon, its systemd service unit,
+This package contains the qti-cam-server daemon, its systemd service unit,
 configuration files and helper scripts that expose the camera hardware
 to QMMF clients.
 
@@ -95,7 +91,7 @@ against QMMF, such as the Qualcomm GStreamer camera plugins.
 
 %build
 # BUILD_CATEGORY=ALL enables the common libraries, the recorder client,
-# the server libraries and the cam-server daemon.
+# the server libraries and the qti-cam-server daemon.
 %cmake \
     -DCMAKE_INSTALL_SYSCONFDIR:PATH=%{_sysconfdir} \
     -DCMAKE_INSTALL_LIBEXECDIR:PATH=%{_libexecdir} \
@@ -112,23 +108,24 @@ against QMMF, such as the Qualcomm GStreamer camera plugins.
 # camera hardware.
 
 %post
-%systemd_post cam-server.service
+%systemd_post qti-cam-server.service
 
 %preun
-%systemd_preun cam-server.service
+%systemd_preun qti-cam-server.service
 
 %postun
-%systemd_postun_with_restart cam-server.service
+%systemd_postun_with_restart qti-cam-server.service
 
 %files
 %license LICENSE.txt
 %doc README.md NOTICE
-%config(noreplace) %{_sysconfdir}/cam-server.ini
-%config(noreplace) %{_sysconfdir}/cam-server-env
-%{_bindir}/cam-server
+%config(noreplace) %{_sysconfdir}/qti-cam-server.ini
+%config(noreplace) %{_sysconfdir}/qti-cam-server-env
+%{_bindir}/qti-cam-server
 %dir %{_libexecdir}/qmmf-server
 %{_libexecdir}/qmmf-server/check-camx-overlay.sh
-%{_unitdir}/cam-server.service
+%{_libdir}/udev/rules.d/99-camera.rules
+%{_unitdir}/qti-cam-server.service
 
 %files -n libqmmf-common
 %license LICENSE.txt
@@ -166,5 +163,9 @@ against QMMF, such as the Qualcomm GStreamer camera plugins.
 %{_libdir}/pkgconfig/qmmf_utils.pc
 
 %changelog
+* Mon Sep 28 2026 Viswanath Srikanth Bathina <bathina@qti.qualcomm.com> - 1.0.6-1
+- Update to upstream release 1.0.6.
+- Drop patches integrated upstream and refresh the CamX target guard.
+
 * Fri Aug 14 2026 Viswanath Srikanth Bathina <bathina@qti.qualcomm.com> - 1.0.4-1
 - Initial RPM packaging for CentOS Stream 10 (aarch64)
