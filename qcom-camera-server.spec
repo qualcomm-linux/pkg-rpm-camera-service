@@ -2,7 +2,7 @@
 %global _hardened_build 1
 
 Name:           qcom-camera-server
-Version:        1.0.6
+Version:        1.0.5
 Release:        1%{?dist}
 Summary:        Qualcomm Linux embedded camera server
 
@@ -25,7 +25,7 @@ BuildRequires:  protobuf-compiler
 BuildRequires:  abseil-cpp-devel
 # Optional: enables the GBM memory backend
 BuildRequires:  pkgconfig(gbm)
-BuildRequires:  libcamx-dev
+BuildRequires:  libcamx-devel
 
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -124,7 +124,6 @@ against QMMF, such as the Qualcomm GStreamer camera plugins.
 %{_bindir}/qti-cam-server
 %dir %{_libexecdir}/qmmf-server
 %{_libexecdir}/qmmf-server/check-camx-overlay.sh
-%{_libdir}/udev/rules.d/99-camera.rules
 %{_unitdir}/qti-cam-server.service
 
 %files -n libqmmf-common
@@ -163,9 +162,5 @@ against QMMF, such as the Qualcomm GStreamer camera plugins.
 %{_libdir}/pkgconfig/qmmf_utils.pc
 
 %changelog
-* Mon Sep 28 2026 Viswanath Srikanth Bathina <bathina@qti.qualcomm.com> - 1.0.6-1
-- Update to upstream release 1.0.6.
-- Drop patches integrated upstream and refresh the CamX target guard.
-
-* Fri Aug 14 2026 Viswanath Srikanth Bathina <bathina@qti.qualcomm.com> - 1.0.4-1
+* Fri Aug 14 2026 Viswanath Srikanth Bathina <bathina@qti.qualcomm.com> - 1.0.5-1
 - Initial RPM packaging for CentOS Stream 10 (aarch64)
