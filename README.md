@@ -22,6 +22,7 @@ repository documentation and workflow support files.
 | `qcom-camera-server.spec` | Builds the camera server and QMMF runtime and development packages. |
 | `sources` | SHA-512 checksum for the `camera-service` source archive. |
 | `0001-camx-guard-target-builds.patch` | Applies the CamX target-build guard required by this package. |
+| `0002-add-lib64-library-search-path.patch` | Adds the lib64 library search path required by this package. |
 | `README.md` | Package and repository documentation. |
 | `LICENSE.txt` | License for the RPM packaging repository. |
 
@@ -75,7 +76,7 @@ sudo dnf install -y qcom-camera-server libqmmf-devel
 
 1. Update `Version:` in `qcom-camera-server.spec`. `Source0` uses the package
    version to select the corresponding `camera-service` release archive.
-2. Update `Patch0` if the upstream source layout or CamX build behavior changes.
+2. Update the relevant `PatchN` entries if downstream patch behavior changes.
 3. Regenerate the source checksum:
 
    ```bash

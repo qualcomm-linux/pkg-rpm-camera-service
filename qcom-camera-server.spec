@@ -3,7 +3,7 @@
 
 Name:           qcom-camera-server
 Version:        1.0.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Qualcomm Linux embedded camera server
 
 License:        BSD-3-Clause-Clear
@@ -11,6 +11,7 @@ URL:            https://github.com/qualcomm/camera-service
 Source0:        %{url}/archive/refs/tags/%{version}/camera-service-%{version}.tar.gz
 
 Patch0:         0001-camx-guard-target-builds.patch
+Patch1:         0002-add-lib64-library-search-path.patch
 
 ExclusiveArch:  aarch64
 
@@ -162,5 +163,8 @@ against QMMF, such as the Qualcomm GStreamer camera plugins.
 %{_libdir}/pkgconfig/qmmf_utils.pc
 
 %changelog
+* Wed Sep 30 2026 Viswanath Srikanth Bathina <bathina@qti.qualcomm.com> - 1.0.5-2
+- Add the lib64 library search path for camera-service runtime libraries.
+
 * Fri Aug 14 2026 Viswanath Srikanth Bathina <bathina@qti.qualcomm.com> - 1.0.5-1
 - Initial RPM packaging for CentOS Stream 10 (aarch64)
