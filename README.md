@@ -79,6 +79,111 @@ sudo dnf install -y qcom-camera-server libqmmf-devel
 2. Update the relevant `PatchN` entries if downstream patch behavior changes.
 3. Regenerate the source checksum:
 
+```
+Source0: https://github.com/<org>/<proj>/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+```
+
+### 3. Record the tarball checksum
+
+**The tarball is never committed to git.** Only its checksum is:
+
+```bash
+sha512sum --tag <your-component>-1.0.tar.gz > sources
+```
+
+which yields a line like:
+
+```
+SHA512 (mycomponent-1.0.tar.gz) = 3a7bd3e2360a3d29eea436fcfb7e44c735d117c...
+```
+
+### 4. Open a PR against this branch
+
+`build-on-pr` fetches the tarball (from the lookaside cache, or from the spec's
+`Source` URL on a cache miss), verifies the checksum, and builds the RPM(s).
+Download them from the run's **Artifacts**.
+
+
+### 5. Release
+
+**Actions → Release → Run workflow**, selecting this branch. A reviewer approves
+the `pkg-release-approval` gate, then the RPM(s) publish to Artifactory.
+
+---
+
+## Local usage
+
+The `build-on-pr.yml` build can be reproduced on an **aarch64** host with
+`docker`, `git`, `curl`, and `bash`. The steps below mirror the
+`pkg-build-reusable-workflow.yml` job in
+[`qcom-rpm-utils`](https://github.com/qualcomm-linux/qcom-rpm-utils). Step 1
+checks out the `c10s` branch; run the later steps from the **repository root**.
+
+1. Clone this repository, check out the `c10s` packaging branch, then fetch the
+   build tooling and build the builder image. CI pulls the same image from GHCR;
+   building it locally avoids the GHCR login:
+
+   ```sh
+   git clone https://github.com/qualcomm-linux/pkg-rpm-camera-service.git
+   cd pkg-rpm-camera-service
+   git checkout c10s
+   git clone https://github.com/qualcomm-linux/qcom-rpm-utils.git tool
+   docker build -f tool/docker/Dockerfile.rpm-builder -t rpm-builder:centos10 tool/docker/
+   ```
+
+2. Resolve the source archive against `sources`. `resolve-sources.sh` appends
+   to `$GITHUB_OUTPUT`, so start from an empty file:
+
+   ```sh
+   export GITHUB_OUTPUT="$PWD/resolve_sources_output.env"
+   : > "$GITHUB_OUTPUT"
+   tool/scripts/resolve-sources.sh \
+     --sources sources \
+     --spec qcom-camera-server.spec \
+     --cache-base-url https://dummy_url \
+     --dest "$PWD/sources-cache"
+   # tarballs= is an unquoted, space-separated list; sourcing the file would
+   # run every path after the first as a command, so read the values instead.
+   tarball="$(sed -n 's/^tarball=//p' "$GITHUB_OUTPUT")"
+   tarballs="$(sed -n 's/^tarballs=//p' "$GITHUB_OUTPUT")"
+   ```
+
+   The lookaside cache is tried first. On a miss, the archive is downloaded from
+   the spec's `Source0` (the GitHub tag archive), and in both cases it is verified against
+   the checksum in `sources`.
+
+3. Build:
+
+   ```sh
+   tool/scripts/build-rpm.sh \
+     --tarball "$tarballs" \
+     --spec qcom-camera-server.spec \
+     --output output \
+     --builder-image rpm-builder:centos10
+   ```
+
+   `libcamx-devel` comes from the public Qualcomm Software Center repos, which
+   the `rpm-builder:centos10` image already enables, so no extra repo is
+   needed. To build against packages that are only in the staging repo, add
+   `--extra-repo` with an Artifactory token in the URL, and do not share the
+   build log, since `build-rpm.sh` prints that URL.
+
+   `build-rpm.sh` copies every file beside the spec into the build workspace,
+   so the spec can be built straight from the repository root.
+
+Binary and source RPMs are written to `output/`. Nothing is uploaded; publishing
+happens only through `pkg-release.yml`. The build leaves `tool/`,
+`sources-cache/`, `output/`, and `resolve_sources_output.env` in the repository
+root; they are not part of the package and can be deleted.
+
+---
+
+## Updating the version
+
+Two edits, every time:
+
+1. Bump `Version:` in the spec (and the `Source0:` URL if its path changed).
+2. Recompute the checksum:
    ```bash
    sha512sum --tag camera-service-<version>.tar.gz > sources
    ```
